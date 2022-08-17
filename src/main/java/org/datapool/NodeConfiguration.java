@@ -32,6 +32,7 @@ import java.util.UUID;
 @Configuration
 public class NodeConfiguration {
     public static final String DEFAULT_REGION_NAME = "PersistenceDataRegion";
+    public static final String STATIC_CACHE_NAME = "STATIC_PARAMS_CACHE";
     @Value("${csv.repo}")
     public String csvPath;
     @Value("${datapools.nodes}")
@@ -83,6 +84,7 @@ public class NodeConfiguration {
         Ignite ignite = Ignition.start(cfg);
         ignite.cluster().state(ClusterState.ACTIVE);
         ignite.getOrCreateCache(CacheFactory.prepareMetadataCacheConfiguration());
+        ignite.getOrCreateCache(CacheFactory.prepareDefaultStaticCacheConfiguration(STATIC_CACHE_NAME));
 
         ClusterGroup cacheGrp = ignite.cluster();
         IgniteServices svcs = ignite.services(cacheGrp);

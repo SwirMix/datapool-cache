@@ -5,6 +5,8 @@ import org.apache.ignite.IgniteCache;
 import org.datapool.core.DataSources;
 import org.datapool.core.Strategy;
 import org.datapool.core.cache.CacheMetadata;
+import org.datapool.core.cache.dto.StaticCacheKey;
+import org.datapool.core.cache.dto.StaticCacheValue;
 import org.datapool.core.jwt.impl.JwtService;
 import org.datapool.dto.*;
 import org.datapool.services.BusyException;
@@ -16,10 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -34,6 +33,28 @@ public class DatapoolRestController {
     private PrometheusMetrics metrics;
     @Autowired
     private JwtService jwtService;
+
+    @CrossOrigin(origins = "http://localhost:8080")
+    @GetMapping("/static/single")
+    public ResponseEntity getSingleStaticEntity(
+            @RequestParam(required = true) String cacheUuid,
+            @RequestParam(required = true) String projectId,
+            @RequestParam(required = true) String consumer,
+            @RequestHeader(required = true) String remoteToken
+    ){
+        StaticCacheKey key = new StaticCacheKey(projectId, cacheUuid);
+        if (checkRemoteTokenStaticCachePerm(remoteToken, key)) {
+            metrics.incrementGetCacheMetric(projectId + "_" + cacheUuid, consumer);
+            StaticCacheValue value = datapoolManager.getStaticParameter(key);
+            return new ResponseEntity(new ParametersResponse()
+                    .setStatus(Result.SUCCESS)
+                    .setErrorMessage(new ErrorMessage("OK"))
+                    .setParams(value)
+                    .setStrategy(Strategy.UNIQUE), HttpStatus.OK);
+        } else {
+            return new ResponseEntity(new ErrorMessage("permission denied"), HttpStatus.FORBIDDEN);
+        }
+    }
 
     @CrossOrigin(origins = "http://localhost:8080")
     @GetMapping("/parameters/single")
@@ -55,7 +76,6 @@ public class DatapoolRestController {
         } else {
             return new ResponseEntity(new ErrorMessage("permission denied"), HttpStatus.FORBIDDEN);
         }
-
     }
 
     public boolean checkRemoteToken(String remoteToken, String cacheName){
@@ -63,6 +83,14 @@ public class DatapoolRestController {
         CacheMetadata metadata = datapoolManager.getCacheMetadata(cacheName);
         List projects = (List) tokenData.get("projects");
         if (((List<String>)tokenData.get("projects")).contains(metadata.getBaseProject())) {
+            return true;
+        } else return false;
+    }
+
+    public boolean checkRemoteTokenStaticCachePerm(String remoteToken, StaticCacheKey key){
+        Map tokenData = jwtService.decryptRemoteToken(remoteToken);
+        List projects = (List) tokenData.get("projects");
+        if (((List<String>)tokenData.get("projects")).contains(key.getProject())) {
             return true;
         } else return false;
     }

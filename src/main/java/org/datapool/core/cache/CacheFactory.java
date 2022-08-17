@@ -4,17 +4,25 @@ import org.apache.ignite.cache.CacheAtomicityMode;
 import org.apache.ignite.cache.CacheMode;
 import org.apache.ignite.configuration.CacheConfiguration;
 import org.datapool.NodeConfiguration;
+import org.datapool.core.cache.dto.StaticCacheKey;
+import org.datapool.core.cache.dto.StaticCacheValue;
 
-import javax.cache.expiry.CreatedExpiryPolicy;
-import javax.cache.expiry.Duration;
 import java.util.HashMap;
-import java.util.List;
 
 public class CacheFactory {
     public static final String DEFAULT_METADATA_CACHE = "Metadata";
     public static final String SEQUENTIAL_CACHE = "SEQUENTIAL_CACHE";
     public static CacheConfiguration<Integer, HashMap<String, Object>> prepareDefaultCacheConfiguration(String cacheName){
         CacheConfiguration<Integer, HashMap<String, Object>> cacheConfiguration = new CacheConfiguration();
+        cacheConfiguration.setName(cacheName);
+        cacheConfiguration.setCacheMode(CacheMode.PARTITIONED);
+        cacheConfiguration.setAtomicityMode(CacheAtomicityMode.ATOMIC);
+        cacheConfiguration.setDataRegionName(NodeConfiguration.DEFAULT_REGION_NAME);
+        return cacheConfiguration;
+    }
+
+    public static CacheConfiguration<StaticCacheKey, StaticCacheValue> prepareDefaultStaticCacheConfiguration(String cacheName){
+        CacheConfiguration<StaticCacheKey, StaticCacheValue> cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setName(cacheName);
         cacheConfiguration.setCacheMode(CacheMode.PARTITIONED);
         cacheConfiguration.setAtomicityMode(CacheAtomicityMode.ATOMIC);

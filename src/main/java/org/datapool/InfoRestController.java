@@ -7,10 +7,18 @@ import org.apache.ignite.cluster.ClusterNode;
 import org.datapool.core.DataSources;
 import org.datapool.core.Strategy;
 import org.datapool.core.cache.CacheMetadata;
+import org.datapool.core.cache.dto.StaticCacheKey;
+import org.datapool.core.cache.dto.StaticCacheValue;
 import org.datapool.core.csv.PersistenceCsvService;
+import org.datapool.core.jwt.TokenObject;
+import org.datapool.core.jwt.impl.JwtService;
 import org.datapool.dto.ErrorMessage;
+import org.datapool.dto.ParametersResponse;
+import org.datapool.dto.PostStaticParameters;
+import org.datapool.dto.Result;
 import org.datapool.services.DataImportService;
 import org.datapool.services.DatapoolManager;
+import org.datapool.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +46,88 @@ public class InfoRestController {
     private DatapoolManager datapoolManager;
     @Autowired
     private Ignite ignite;
+    @Autowired
+    private JwtService jwtService;
+    @Autowired
+    private UserService userService;
+
+    public boolean checkProjectByToken(String remoteToken, StaticCacheKey key){
+        TokenObject tokenData = jwtService.decryptToken(remoteToken);
+        List projects = userService.getProjectsList(tokenData.getUserId());
+        if (projects.contains(key.getProject())) {
+            return true;
+        } else return false;
+    }
+
+    @CrossOrigin(origins = "http://localhost:8080")
+    @PostMapping("/static/create")
+    public ResponseEntity postSingleStaticEntity(
+            @RequestBody(required = true) PostStaticParameters parameters,
+            @RequestHeader(required = true) String token
+    ){
+        StaticCacheValue value = parameters.getValue();
+        value.setUpdateDate(new Date());
+        if (checkProjectByToken(token, parameters.getKey())) {
+            PostStaticParameters response = datapoolManager.updateStaticParameter(parameters.getKey().setCacheUUID(UUID.randomUUID().toString()), parameters.getValue());
+            return new ResponseEntity(new ParametersResponse()
+                    .setStatus(Result.SUCCESS)
+                    .setErrorMessage(new ErrorMessage("OK"))
+                    .setParams(response)
+                    .setStrategy(Strategy.UNIQUE), HttpStatus.OK);
+        } else {
+            return new ResponseEntity(new ErrorMessage("permission denied"), HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @CrossOrigin(origins = "http://localhost:8080")
+    @DeleteMapping("/datapool/static/single")
+    public ResponseEntity deleteSingleStaticEntity(
+            @RequestParam(required = true) String cacheUuid,
+            @RequestParam(required = true) String projectId,
+            @RequestHeader(required = true) String token
+    ){
+        StaticCacheKey key = new StaticCacheKey(projectId, cacheUuid);
+        if (checkProjectByToken(token, key)) {
+            datapoolManager.deleteStaticParameter(new StaticCacheKey(projectId, cacheUuid));
+            return new ResponseEntity(new ErrorMessage("success"), HttpStatus.OK);
+        } else {
+            return new ResponseEntity(new ErrorMessage("permission denied"), HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @CrossOrigin(origins = "http://localhost:8080")
+    @PatchMapping("/datapool/static/update")
+    public ResponseEntity updateSingleStaticEntity(
+            @RequestBody(required = true) PostStaticParameters parameters,
+            @RequestHeader(required = true) String token
+    ){
+        StaticCacheValue value = parameters.getValue();
+        value.setUpdateDate(new Date());
+        if (checkProjectByToken(token, parameters.getKey())){
+            PostStaticParameters response = datapoolManager.updateStaticParameter(parameters.getKey(), parameters.getValue());
+            return new ResponseEntity(new ParametersResponse()
+                    .setStatus(Result.SUCCESS)
+                    .setErrorMessage(new ErrorMessage("OK"))
+                    .setParams(response)
+                    .setStrategy(Strategy.UNIQUE), HttpStatus.OK);
+        } else {
+            return new ResponseEntity(new ErrorMessage("permission denied"), HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @CrossOrigin(origins = "http://localhost:8080")
+    @GetMapping("/static/caches")
+    public ResponseEntity getSingleCaches(
+            @RequestParam(required = true) String projectId
+    ){
+        ArrayList<Map<String, Object>> result = new ArrayList<>();
+        for (Map parameters : datapoolManager.getAllStaticCaches()){
+            if (parameters.get("projectId").equals(projectId)){
+                result.add(parameters);
+            }
+        };
+        return new ResponseEntity(result, HttpStatus.OK);
+    }
 
     @CrossOrigin(origins = "http://localhost:8080")
     @GetMapping("/cluster")

@@ -2,10 +2,13 @@ package org.datapool.services;
 
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
+import org.datapool.NodeConfiguration;
 import org.datapool.core.CacheStatus;
 import org.datapool.core.DataSources;
 import org.datapool.core.cache.CacheFactory;
 import org.datapool.core.cache.CacheMetadata;
+import org.datapool.core.cache.dto.StaticCacheKey;
+import org.datapool.core.cache.dto.StaticCacheValue;
 import org.datapool.core.csv.PersistenceCsvService;
 import org.datapool.core.datapool.Datapool;
 import org.datapool.core.datapool.ServiceFactory;
@@ -13,6 +16,7 @@ import org.datapool.core.Strategy;
 import org.datapool.dto.CreateCacheRequest;
 import org.datapool.dto.MetadataResponse;
 import org.datapool.dto.PostParameters;
+import org.datapool.dto.PostStaticParameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import static org.datapool.NodeConfiguration.STATIC_CACHE_NAME;
+
 @Service
 public class DatapoolManager{
     @Autowired
@@ -31,11 +37,34 @@ public class DatapoolManager{
     private DataImportService importService;
     @Autowired
     private PersistenceCsvService csvService;
+    private IgniteCache<StaticCacheKey, StaticCacheValue> staticParameters;
 
     private ConcurrentHashMap<Strategy, Datapool> datapools = new ConcurrentHashMap<>();
 
     public DatapoolManager(){
 
+    }
+
+    private IgniteCache<StaticCacheKey, StaticCacheValue> initStaticCache(){
+        if (staticParameters==null){
+            staticParameters = ignite.getOrCreateCache(
+                    CacheFactory.prepareDefaultStaticCacheConfiguration(STATIC_CACHE_NAME)
+            );
+        }
+        return staticParameters;
+    }
+
+    public StaticCacheValue getStaticParameter(StaticCacheKey key){
+        return initStaticCache().get(key);
+    }
+
+    public PostStaticParameters updateStaticParameter(StaticCacheKey key, StaticCacheValue value){
+        initStaticCache().put(key, value);
+        return new PostStaticParameters(key, value);
+    }
+
+    public void deleteStaticParameter(StaticCacheKey key){
+        initStaticCache().remove(key);
     }
 
     public Map postCacheData(PostParameters postParameters){
@@ -95,6 +124,26 @@ public class DatapoolManager{
             Cache.Entry<String, CacheMetadata> entry = iterator.next();
             CacheMetadata metadata = entry.getValue();
             arrayList.add(metadata);
+        }
+        return arrayList;
+    }
+
+    public List<Map<String, Object>> getAllStaticCaches(){
+        IgniteCache<StaticCacheKey, StaticCacheValue> caches = initStaticCache();
+        ArrayList<Map<String,Object>> arrayList = new ArrayList();
+        Iterator<Cache.Entry<StaticCacheKey, StaticCacheValue>> iterator = caches.iterator();
+        while (iterator.hasNext()){
+            Cache.Entry<StaticCacheKey, StaticCacheValue> entry = iterator.next();
+            StaticCacheValue metadata = entry.getValue();
+            StaticCacheKey key = entry.getKey();
+            Map<String, Object> item = new HashMap<>();
+            item.put("name", metadata.getName());
+            item.put("cacheUUID", key.getCacheUUID());
+            item.put("projectId", key.getProject());
+            item.put("lastUpdate", metadata.getUpdateDate());
+            item.put("parameters", metadata.getParameters());
+            arrayList.add(item);
+
         }
         return arrayList;
     }
