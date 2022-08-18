@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 var apiClient = {
-  server_endpoint: 'http://localhost:8086/',
+  server_endpoint: '',
   api: {
      post_auth: 'api/v1/account/auth',
      remote_token_auth: 'api/v1/account/remote/auth',
