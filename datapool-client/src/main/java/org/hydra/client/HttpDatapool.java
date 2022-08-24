@@ -56,9 +56,14 @@ public class HttpDatapool{
         return (ParametersResponse) getResponse(response.execute());
     }
 
+    public ParametersResponse getStaticParameters(String projectId, String cacheUUID, String consumer) throws IOException, HttpPoolError {
+        Call response = client.getStaticParameters(remoteToken, cacheUUID, projectId, consumer);
+        return (ParametersResponse) getResponse(response.execute());
+    }
+
     private Object getResponse(Response response) throws HttpPoolError {
         if (response.code()==200 | response.code()==201) {
             return response.body();
-        } else throw new HttpPoolError(response);
+        } else throw new HttpPoolError(response, response.code());
     }
 }

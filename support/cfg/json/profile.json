@@ -1,0 +1,24 @@
+{
+  "profile_body": [
+    {
+      "scriptName": "UC001_GetCacheRandomParameters",
+      "project_id": "uuid-uuid-uuid-uuid",
+      "javaRequestSample": "org.hydra.samplers.GetCacheRandomParameters",
+      "parameters": {
+        "datapoolUrl": "http://localhost:8086",
+        "datapoolRemoteToken": "",
+        "consumer": "GetCacheRandomParameters",
+        "users_datapool": "users.csv",
+        "influxdb_url": "http://localhost:8088",
+        "influxdb_db": "transactions",
+        "influxdb_meansure": "transactions"
+      },
+      "tpm": 856.930,
+      "threads": 5,
+      "generators": ["192.168.0.1","192.168.0.2"],
+      "ramp_up_seconds": 300,
+      "start_up_delay": 0,
+      "duration": -1
+    }
+  ]
+}

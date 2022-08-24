@@ -82,3 +82,35 @@ GRANT ALL ON TABLE datapool.projects TO perfcona;
 -- Permissions
 
 GRANT ALL ON SCHEMA datapool TO perfcona;
+
+CREATE TABLE datapool.projects (
+	id varchar(200) NOT NULL,
+	"name" varchar(200) NULL,
+	owner_id int4 NULL,
+	description varchar(800) NOT NULL,
+	CONSTRAINT projects_pkey PRIMARY KEY (id),
+	CONSTRAINT projects_fk FOREIGN KEY (owner_id) REFERENCES datapool.users(id)
+);
+
+CREATE TABLE datapool.scripts (
+    scriptName varchar(300),
+    projectId varchar(200) references datapool.projects,
+    description varchar(500),
+    transactions text[],
+    script_default_parameters jsonb,
+    primary key (scriptName, projectId)
+)
+
+CREATE TABLE datapool.parameters (
+    id varchar(200) primary key,
+    parameters jsonb
+)
+
+CREATE TABLE datapool.profiles (
+    id varchar(200) primary key,
+    name varchar(200),
+    description varchar(500),
+    projectId varchar(200) references datapool.projects,
+    update_date TIMESTAMP WITH TIME ZONE,
+    profile jsonb default '{}'
+)

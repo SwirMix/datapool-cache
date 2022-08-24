@@ -9,15 +9,28 @@
 
   <name>datapool-client</name>
   <url>http://maven.apache.org</url>
+  <description>Сборка инструментария для разработки tests as code.</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <retorit.version>2.9.0</retorit.version>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
+    <jupiter-engine>5.8.2</jupiter-engine>
+    <jedis>3.6.0</jedis>
+    <jmeter-dsl>0.62.1</jmeter-dsl>
+    <jmeter.version>5.5</jmeter.version>
+    <org.assertj.version>3.22.0</org.assertj.version>
+    <jmeter-java-dsl-wrapper>0.64.3</jmeter-java-dsl-wrapper>
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>us.abstracta.jmeter</groupId>
+      <artifactId>jmeter-java-dsl-wrapper</artifactId>
+      <version>${jmeter-java-dsl-wrapper}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>com.squareup.retrofit2</groupId>
       <artifactId>retrofit</artifactId>
@@ -29,16 +42,55 @@
       <version>${retorit.version}</version>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>${org.assertj.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.jmeter</groupId>
+      <artifactId>ApacheJMeter_java</artifactId>
+      <version>${jmeter.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>us.abstracta.jmeter</groupId>
+      <artifactId>jmeter-java-dsl</artifactId>
+      <version>${jmeter-dsl}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>redis.clients</groupId>
+      <artifactId>jedis</artifactId>
+      <version>${jedis}</version>
       <scope>test</scope>
     </dependency>
-      <dependency>
-          <groupId>org.testng</groupId>
-          <artifactId>testng</artifactId>
-          <version>7.6.1</version>
-          <scope>test</scope>
-      </dependency>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>7.6.1</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id> <!-- this is used for inheritance merges -->
+            <phase>package</phase> <!-- bind to the packaging phase -->
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

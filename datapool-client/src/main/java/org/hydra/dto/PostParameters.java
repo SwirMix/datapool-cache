@@ -3,7 +3,7 @@ package org.hydra.dto;
 import java.util.Map;
 
 public class PostParameters {
-    private Map<String, String> parameters;
+    private Map<String, Object> parameters;
     private String cacheName;
 
     public String getCacheName() {
@@ -15,11 +15,11 @@ public class PostParameters {
         return this;
     }
 
-    public Map<String, String> getParameters() {
+    public Map<String, Object> getParameters() {
         return parameters;
     }
 
-    public PostParameters setParameters(Map<String, String> parameters) {
+    public PostParameters setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
         return this;
     }

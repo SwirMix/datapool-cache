@@ -36,4 +36,12 @@ public interface HttpDatapoolClient {
 
     @GET("/api/v1/strategy")
     public Call<String[]> getStrategy();
+
+    @GET("/api/v1/datapool/static/single")
+    public Call<ParametersResponse> getStaticParameters(
+            @Header("remoteToken") String token,
+            @Query("cacheUuid") String cacheUUID,
+            @Query("projectId") String projectId,
+            @Query("consumer") String consumer
+    );
 }

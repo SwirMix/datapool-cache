@@ -1,0 +1,16 @@
+{
+  "scriptName": "UC001_GetCacheRandomParameters",
+  "desc": "test for test",
+  "project_id": "uuid-uuid-uuid-uuid",
+  "parameters": {
+    "transactions": ["get_cfg","ger_random_params"],
+    "javaRequestSample": "org.hydra.samplers.GetCacheRandomParameters",
+    "datapoolUrl": "http://localhost:8086",
+    "datapoolRemoteToken": "",
+    "consumer": "GetCacheRandomParameters",
+    "users_datapool": "users.csv",
+    "influxdb_url": "http://localhost:8088",
+    "influxdb_db": "transactions",
+    "influxdb_meansure": "transactions"
+  }
+}
