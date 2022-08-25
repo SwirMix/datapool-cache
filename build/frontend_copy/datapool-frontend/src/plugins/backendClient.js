@@ -19,8 +19,8 @@ var apiClient = {
      post_create_project: 'api/v1/projects/create',
      delete_project: 'api/v1/projects/delete',
      get_static_caches: 'api/v1/static/caches',
-     patch_static_cache: 'api/v1/datapool/static/update',
-     delete_static_cache: 'api/v1/datapool/static/single',
+     patch_static_cache: 'api/v1/static/update',
+     delete_static_cache: 'api/v1/static/single',
      create_static_cache: 'api/v1/static/create'
   },
 
