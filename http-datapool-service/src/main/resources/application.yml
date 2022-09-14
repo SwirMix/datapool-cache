@@ -1,0 +1,27 @@
+csv:
+  repo:  /home/ponchick/Desktop/datapool-cache/build/data
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,info,metric
+server:
+  port: 8086
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/demo?currentSchema=datapool
+    username: perfcona
+    password: perfcona
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+  servlet:
+    multipart:
+      max-file-size: 512000KB
+      max-request-size: 512000KB
+datapools:
+  nodes: 127.0.0.1:47500..47509,127.0.0.1:47500..47509
+ignite:
+  instance:
+    key: datapool-storage-controller

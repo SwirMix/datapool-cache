@@ -1,4 +1,4 @@
-work_dir="/home/ponchick/Desktop/datapool-service/service-source/build"
+work_dir="/home/ponchick/Desktop/datapool-cache/build"
 export DATAPOOL_WORKDIR=${work_dir}
 rm -r ${DATAPOOL_WORKDIR}/ignite/
 java \

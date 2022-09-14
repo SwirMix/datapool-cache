@@ -1,5 +1,5 @@
 csv:
-  repo:  /home/ponchick/Desktop/datapool-service/service-source/build/data
+  repo:  /home/ponchick/Desktop/datapool-cache/build/data
 management:
   endpoints:
     web:

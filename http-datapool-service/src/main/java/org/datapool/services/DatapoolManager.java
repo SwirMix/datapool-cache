@@ -166,6 +166,9 @@ public class DatapoolManager{
     public MetadataResponse initCache(CreateCacheRequest createCacheRequest) throws Exception {
         if (checkPool(createCacheRequest.getProjectId() + "_" + createCacheRequest.getCacheName())) throw new Exception();
         else {
+            if (createCacheRequest.getColumns()==null){
+                createCacheRequest.setColumns(new ArrayList<>());
+            }
             return initCache(
                     createCacheRequest.getQuery(),
                     createCacheRequest.getConnectionProperties(),
