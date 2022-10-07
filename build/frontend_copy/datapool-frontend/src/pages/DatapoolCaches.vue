@@ -39,9 +39,6 @@
               <CacheInfoDialog class="ma-2" v-bind:item="item"></CacheInfoDialog>
           </v-row>
         </template>
-        <template v-slot:[`item.columns`]="{ item }">
-            {{slice_desc(item.columns.join(","))}}
-        </template>
         <template v-slot:no-data>
           <v-btn
             color="primary"
