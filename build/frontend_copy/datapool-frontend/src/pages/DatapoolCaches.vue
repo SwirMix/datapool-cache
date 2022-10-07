@@ -39,6 +39,9 @@
               <CacheInfoDialog class="ma-2" v-bind:item="item"></CacheInfoDialog>
           </v-row>
         </template>
+        <template v-slot:[`item.columns`]="{ item }">
+            {{slice_desc(item.columns.join(","))}}
+        </template>
         <template v-slot:no-data>
           <v-btn
             color="primary"
@@ -103,6 +106,13 @@
                console.log(response)
                this.REFRESH_CACHES(this.GET_CURRENT_PROJECT().id)
             })
+        },
+        slice_desc(text){
+            var sliced = text.slice(0,50);
+            if (sliced.length < text.length) {
+                sliced += '...';
+            }
+            return sliced
         }
     },
     created(){
