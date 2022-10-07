@@ -82,7 +82,6 @@
           { text: 'Type', value: 'type' },
           { text: 'project', value: 'baseProject' },
           { text: 'rowCount', value: 'rowCount' },
-          { text: 'Columns', value: 'columns' },
           { text: 'Status', value: 'status' },
           { text: 'Actions', value: 'actions'}
         ]
